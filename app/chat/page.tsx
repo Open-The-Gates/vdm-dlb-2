@@ -1,101 +1,86 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { Send, Bot, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent } from "@/components/ui/card";
-import { useChat } from "ai/react";
-import { cn } from "@/lib/utils";
-import { NavRail } from "@/components/dataroom/nav-rail";
+import * as React from "react"
+import { Send, Bot, User } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useChat } from "ai/react"
+import { cn } from "@/lib/utils"
+import { NavRail } from "@/components/dataroom/nav-rail"
 
 export default function ChatPage() {
-  const [activeView, setActiveView] = React.useState("chatbot");
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({
-      api: "/api/chat",
-    });
+  const [activeView, setActiveView] = React.useState("chatbot")
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: "/api/chat",
+  })
 
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const handleViewChange = (view: string) => {
     if (view === "dataroom") {
-      window.location.href = "/";
+      window.location.href = "/"
     } else {
-      setActiveView(view);
+      setActiveView(view)
     }
-  };
+  }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen w-full bg-gray-100/50 dark:bg-black">
       <NavRail activeView={activeView} setActiveView={handleViewChange} />
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="border-b bg-white dark:bg-gray-800 px-6 py-4">
-          <h1 className="text-xl font-semibold">Chat Assistant</h1>
-          <p className="text-sm text-gray-500">
-            Ask me anything about your data
-          </p>
-        </div>
+      <div className="flex flex-1 flex-col">
+        <header className="flex h-16 items-center justify-between border-b bg-white px-6 dark:bg-gray-950">
+          <div>
+            <h1 className="text-lg font-semibold">Chat Assistant</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Engage with your data through conversation.</p>
+          </div>
+        </header>
 
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-6 py-4">
-            <div className="space-y-4">
+        <main className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="mx-auto max-w-4xl space-y-8 p-6">
               {messages.length === 0 ? (
-                <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <Bot className="mx-auto h-12 w-12 text-gray-400" />
-                    <h2 className="mt-2 text-lg font-medium">
-                      Start a conversation
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Ask me anything about your data or files
-                    </p>
+                <div className="flex h-[calc(100vh-200px)] flex-col items-center justify-center text-center">
+                  <div className="rounded-full border bg-white p-4 shadow-sm dark:bg-gray-900">
+                    <Bot className="h-10 w-10 text-gray-500 dark:text-gray-400" />
                   </div>
+                  <h2 className="mt-4 text-2xl font-semibold">Welcome to the Chat Assistant</h2>
+                  <p className="mt-2 text-gray-500 dark:text-gray-400">
+                    You can start a conversation by typing a message below.
+                  </p>
                 </div>
               ) : (
                 messages.map((message) => (
                   <div
                     key={message.id}
-                    className={cn(
-                      "flex gap-3",
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    )}
+                    className={cn("flex items-start gap-4", message.role === "user" && "justify-end")}
                   >
                     {message.role === "assistant" && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="/bot-avatar.png" />
+                      <Avatar className="h-9 w-9 border">
+                        <AvatarImage src="/bot-avatar.png" alt="Assistant" />
                         <AvatarFallback>
-                          <Bot className="h-4 w-4" />
+                          <Bot className="h-5 w-5" />
                         </AvatarFallback>
                       </Avatar>
                     )}
-
-                    <Card
+                    <div
                       className={cn(
-                        "max-w-[80%]",
-                        message.role === "user"
-                          ? "bg-blue-500 text-white"
-                          : "bg-white dark:bg-gray-800"
+                        "max-w-[75%] rounded-lg p-3 text-sm shadow-sm",
+                        message.role === "user" ? "bg-primary text-primary-foreground" : "bg-white dark:bg-gray-900",
                       )}
                     >
-                      <CardContent className="p-3">
-                        <p className="text-sm whitespace-pre-wrap">
-                          {message.content}
-                        </p>
-                      </CardContent>
-                    </Card>
-
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    </div>
                     {message.role === "user" && (
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src="/user-avatar.png" />
+                      <Avatar className="h-9 w-9 border">
+                        <AvatarImage src="/user-avatar.png" alt="User" />
                         <AvatarFallback>
-                          <User className="h-4 w-4" />
+                          <User className="h-5 w-5" />
                         </AvatarFallback>
                       </Avatar>
                     )}
@@ -105,23 +90,34 @@ export default function ChatPage() {
               <div ref={messagesEndRef} />
             </div>
           </ScrollArea>
-        </div>
+        </main>
 
-        <div className="border-t bg-white dark:bg-gray-800 p-4">
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <Input
-              value={input}
-              onChange={handleInputChange}
-              placeholder="Type your message..."
-              className="flex-1"
-              disabled={isLoading}
-            />
-            <Button type="submit" disabled={isLoading || !input.trim()}>
-              <Send className="h-4 w-4" />
-            </Button>
-          </form>
-        </div>
+        <footer className="border-t bg-white p-4 dark:bg-gray-950">
+          <div className="mx-auto max-w-4xl">
+            <form onSubmit={handleSubmit} className="relative">
+              <Input
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Ask about your financial reports, legal documents, or anything else..."
+                className="h-12 w-full rounded-full bg-gray-100 pr-16 dark:bg-gray-800"
+                disabled={isLoading}
+              />
+              <Button
+                type="submit"
+                size="icon"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full"
+                disabled={isLoading || !input.trim()}
+              >
+                <Send className="h-5 w-5" />
+                <span className="sr-only">Send message</span>
+              </Button>
+            </form>
+            <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-400">
+              You can ask questions like: "Summarize the Q4 2023 report."
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
-  );
+  )
 }
