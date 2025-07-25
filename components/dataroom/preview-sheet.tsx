@@ -1,44 +1,69 @@
-"use client"
+"use client";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetClose } from "@/components/ui/sheet"
-import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
-import type { File as FileType } from "@/lib/data"
-import { PdfViewer } from "./previews/pdf-viewer"
-import { ExcelViewer } from "./previews/excel-viewer"
-import { ImageViewer } from "./previews/image-viewer"
-import { NoPreview } from "./previews/no-preview"
-import { MetadataPanel } from "./metadata-panel"
-import { ActivityFeed } from "./activity-feed"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetClose,
+} from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import type { File as FileType } from "@/lib/data";
+import dynamic from "next/dynamic";
+import { ExcelViewer } from "./previews/excel-viewer";
+import { ImageViewer } from "./previews/image-viewer";
+import { NoPreview } from "./previews/no-preview";
+import { MetadataPanel } from "./metadata-panel";
+import { ActivityFeed } from "./activity-feed";
+
+// Dynamically import PDF viewer to prevent SSR issues
+const PdfViewer = dynamic(
+  () =>
+    import("./previews/pdf-viewer").then((mod) => ({ default: mod.PdfViewer })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 mx-auto"></div>
+          <p className="mt-2 text-sm text-gray-500">Loading PDF viewer...</p>
+        </div>
+      </div>
+    ),
+  }
+);
 
 const FilePreview = ({ file }: { file: FileType }) => {
   if (!file.url) {
-    return <NoPreview />
+    return <NoPreview />;
   }
 
   switch (file.type) {
     case "pdf":
-      return <PdfViewer url={file.url} />
+      return <PdfViewer url={file.url} />;
     case "excel":
-      return <ExcelViewer url={file.url} />
+      return <ExcelViewer url={file.url} />;
     case "image":
-      return <ImageViewer src={file.url || "/placeholder.svg"} alt={file.name} />
+      return (
+        <ImageViewer src={file.url || "/placeholder.svg"} alt={file.name} />
+      );
     default:
-      return <NoPreview />
+      return <NoPreview />;
   }
-}
+};
 
 export const PreviewSheet = ({
   file,
   isOpen,
   onOpenChange,
 }: {
-  file: FileType | null
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
+  file: FileType | null;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }) => {
-  if (!file) return null
+  if (!file) return null;
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -63,5 +88,5 @@ export const PreviewSheet = ({
         </div>
       </SheetContent>
     </Sheet>
-  )
-}
+  );
+};
